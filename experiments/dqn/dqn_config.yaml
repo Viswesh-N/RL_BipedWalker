@@ -1,0 +1,23 @@
+base_config: dqn
+env_name: BipedalWalker-v2
+
+hidden_size: 64
+num_layers: 2
+learning_rate: 1e-3
+total_steps: 300000
+discount: 0.99
+target_update_period: 1000
+clip_grad_norm: 10.0
+use_double_q: false
+learning_starts: 20000
+batch_size: 128
+
+exploration_schedule:
+  type: piecewise
+  points:
+    - [0, 1]
+    - [30000, 0.1]
+    - [total_steps * 0.1, 0.02]
+outside_value: 0.02
+
+replay_buffer_capacity: 1000000
