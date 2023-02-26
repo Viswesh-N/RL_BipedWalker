@@ -14,7 +14,7 @@ from env_configs.schedule import (
 )
 import utils.torch_utils as ptu
 
-def basic_dqn_config(
+def dqn_config(
     env_name: str,
     exp_name: Optional[str] = None,
     hidden_size: int = 64,
