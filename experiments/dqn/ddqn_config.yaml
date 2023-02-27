@@ -1,5 +1,5 @@
 base_config: ddqn
-env_name: BipedalWalker-v2
+env_name: LunarLander-v2
 
 hidden_size: 64
 num_layers: 2

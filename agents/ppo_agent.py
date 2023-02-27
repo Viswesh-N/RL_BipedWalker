@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 import numpy as np
 
-import cs285.infrastructure.pytorch_util as ptu
+import utils.torch_utils as ptu
 
 
 class PPOAgent(nn.Module):

@@ -29,7 +29,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
 
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
-    ptu.init_gpu(use_gpu=not args.no_gpu, gpu_id=args.which_gpu)
+    ptu.gpu_init(use_gpu=not args.no_gpu, gpu_id=args.which_gpu)
 
 
     env = config["make_env"]()
@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--config_file", "-cfg", type=str, required=True)
     parser.add_argument("--eval_interval", "-ei", type=int, default=10000)
     parser.add_argument("--num_eval_trajectories", "-neval", type=int, default=10)
-    parser.add_argument("--num_render_trajectories", "-nvid", type=int, default0=0)
+    parser.add_argument("--num_render_trajectories", "-nvid", type=int, default=0)
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--no_gpu", "-ngpu", action="store_true")
     parser.add_argument("--which_gpu", "-gpu_id", default=0)
@@ -119,7 +119,7 @@ def main():
     
     args = parser.parse_args()
 
-    logdir_prefix = f"hw3_{args.algo}_"  
+    logdir_prefix = f"{args.algo}_"  
 
     config = make_config(args.config_file)
     logger = make_logger(logdir_prefix, config)

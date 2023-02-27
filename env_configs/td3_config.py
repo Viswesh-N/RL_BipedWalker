@@ -31,25 +31,25 @@ def td3_config(
 ):
     def make_critic(observation_shape: Tuple[int, ...], num_actions: int) -> nn.Module:
         return nn.ModuleList([
-            ptu.build_mlp(
+            ptu.build_nn(
                 input_size=np.prod(observation_shape),
                 output_size=1,
-                n_layers=num_layers,
+                num_layers=num_layers,
                 size=hidden_size,
             ) for _ in range(2)
         ])
 
     def make_actor(observation_shape: Tuple[int, ...], num_actions: int) -> nn.Module:
-        return ptu.build_mlp(
+        return ptu.build_nn(
             input_size=np.prod(observation_shape),
             output_size=num_actions,
-            n_layers=num_layers,
+            num_layers=num_layers,
             size=hidden_size,
             output_activation=torch.tanh,  # Ensure action is in valid range
         )
 
     def make_optimizer(params: torch.nn.ParameterList) -> torch.optim.Optimizer:
-        return torch.optim.Adam(params, lr=learning_rate)
+        return torch.optim.Adam(list(params), lr=float(learning_rate))
 
     def make_lr_schedule(
         optimizer: torch.optim.Optimizer,
@@ -57,7 +57,7 @@ def td3_config(
         return torch.optim.lr_scheduler.ConstantLR(optimizer, factor=1.0)
 
     def make_env(render: bool = False):
-        return RecordEpisodeStatistics(gym.make(env_name, render_mode="rgb_array" if render else None, new_step_api = True))
+        return RecordEpisodeStatistics(gym.make(env_name, render_mode="rgb_array" if render else None, new_step_api=True))
 
     log_string = "{}_{}_s{}_l{}_d{}".format(
         exp_name or "td3",

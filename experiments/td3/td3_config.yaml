@@ -1,5 +1,5 @@
 base_config: td3
-env_name: BipedalWalker-v2
+env_name: BipedalWalker-v3
 
 hidden_size: 64
 num_layers: 2

@@ -30,15 +30,15 @@ def dqn_config(
     **kwargs
 ):
     def make_critic(observation_shape: Tuple[int, ...], num_actions: int) -> nn.Module:
-        return ptu.build_mlp(
+        return ptu.build_nn(
             input_size=np.prod(observation_shape),
             output_size=num_actions,
-            n_layers=num_layers,
+            num_layers=num_layers,
             size=hidden_size,
         )
 
     def make_optimizer(params: torch.nn.ParameterList) -> torch.optim.Optimizer:
-        return torch.optim.Adam(params, lr=learning_rate)
+        return torch.optim.Adam(list(params), lr=float(learning_rate))
 
     def make_lr_schedule(
         optimizer: torch.optim.Optimizer,
@@ -54,7 +54,7 @@ def dqn_config(
     )
 
     def make_env(render: bool = False):
-        return RecordEpisodeStatistics(gym.make(env_name, render_mode="rgb_array" if render else None, new_step_api = True))
+        return RecordEpisodeStatistics(gym.make(env_name, render_mode="rgb_array" if render else None, new_step_api=True))
 
     log_string = "{}_{}_s{}_l{}_d{}".format(
         exp_name or "dqn",
