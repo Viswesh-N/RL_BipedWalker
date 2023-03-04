@@ -3,7 +3,7 @@ env_name: BipedalWalker-v3
 
 hidden_size: 64
 num_layers: 2
-learning_rate: 3e-4
+learning_rate: 0.0003
 total_steps: 300000
 discount: 0.99
 clip_param: 0.2

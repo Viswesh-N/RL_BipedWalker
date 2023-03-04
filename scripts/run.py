@@ -81,7 +81,8 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             if step % args.log_interval == 0:
                 update_info["lr"] = agent.lr_scheduler.get_last_lr()[0]
                 for k, v in update_info.items():
-                    logger.log_scalar(v, k, step)
+                    if v is not None:  # Avoid logging None values
+                        logger.log_scalar(v, k, step)
                 logger.flush()
 
         if step % args.eval_interval == 0:
@@ -119,7 +120,7 @@ def main():
     
     args = parser.parse_args()
 
-    logdir_prefix = f"{args.algo}_"  
+    logdir_prefix = ""  
 
     config = make_config(args.config_file)
     logger = make_logger(logdir_prefix, config)

@@ -14,4 +14,4 @@ class StateActionCritic(nn.Module):
         ).to(ptu.device)
     
     def forward(self, obs, acs):
-        return self.net(torch.cat([obs, acs], dim=-1)).squeeze(-1)
+        return self.net(torch.cat([obs, acs], dim=-1)).squeeze(-1)  

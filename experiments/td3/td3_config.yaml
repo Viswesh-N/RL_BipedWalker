@@ -1,10 +1,11 @@
 base_config: td3
-env_name: BipedalWalker-v3
+env_name: InvertedPendulum-v4
 
 hidden_size: 64
 num_layers: 2
-learning_rate: 1e-3
+learning_rate: 0.001
 total_steps: 300000
+learning_starts: 20000
 discount: 0.99
 target_update_period: 2
 policy_noise: 0.2
