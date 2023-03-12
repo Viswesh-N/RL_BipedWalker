@@ -1,7 +1,7 @@
 #  **BipedalWalker and Lunar Lander RL Algorithms**
 
 <p align="center">
-  <img src="images/walker_agent.gif" alt="Bipedal Walker Agent" width="45%">
+  <img src="images/bipedwalker.gif" alt="Bipedal Walker Agent" width="45%">
   <img src="images/lunar_lander.gif" alt="Lunar Lander Agent" width="45%">
 </p>
 
