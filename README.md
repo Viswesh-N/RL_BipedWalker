@@ -10,7 +10,7 @@ This repository contains implementations of various reinforcement learning algor
 ##  **Algorithms Implemented**
 
 - **DQN** (Deep Q-Network)
-- **DDQN** (Double Deep Q-Netowork)
+- **DDQN** (Double Deep Q-Network)
 - **TD3** (Twin Delayed Deep Deterministic Policy Gradient)
 - **PPO** (Proximal Policy Optimization)
 
