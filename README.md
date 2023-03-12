@@ -1,15 +1,16 @@
-# 🏃‍♂️ **BipedalWalker RL Algorithms**
+#  **BipedalWalker RL Algorithms**
+![Bipedal Walker Agent](images/walker_agent.gif)
 
 This repository contains implementations of various reinforcement learning algorithms (DQN, TD3, PPO) for solving the BipedalWalker-v3 environment from OpenAI's Gym. The agents are trained to walk a bipedal robot across uneven terrain.
 
-## 🎮 **Algorithms Implemented**
+##  **Algorithms Implemented**
 
 - **DQN** (Deep Q-Network)
 - **TD3** (Twin Delayed Deep Deterministic Policy Gradient)
 - **PPO** (Proximal Policy Optimization)
 
 
-## 🚀 **Getting Started**
+##  **Getting Started**
 
 ### 1. **Clone the Repository**
 
