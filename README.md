@@ -1,11 +1,16 @@
-#  **BipedalWalker RL Algorithms**
-![Bipedal Walker Agent](images/walker_agent.gif)
+#  **BipedalWalker and Lunar Lander RL Algorithms**
 
-This repository contains implementations of various reinforcement learning algorithms (DQN, TD3, PPO) for solving the BipedalWalker-v3 environment from OpenAI's Gym. The agents are trained to walk a bipedal robot across uneven terrain.
+<p align="center">
+  <img src="images/walker_agent.gif" alt="Bipedal Walker Agent" width="45%">
+  <img src="images/lunar_lander.gif" alt="Lunar Lander Agent" width="45%">
+</p>
+
+This repository contains implementations of various reinforcement learning algorithms (DQN, DDQN TD3, PPO) for solving the Lunar Lander-v2 and BipedalWalker-v3 environment from OpenAI's Gym. 
 
 ##  **Algorithms Implemented**
 
 - **DQN** (Deep Q-Network)
+- **DDQN** (Double Deep Q-Netowork)
 - **TD3** (Twin Delayed Deep Deterministic Policy Gradient)
 - **PPO** (Proximal Policy Optimization)
 
@@ -48,11 +53,13 @@ export PYTHONPATH=$(pwd)
 
 #### **DQN**
 
-Train the DQN agent on the BipedalWalker-v3 environment:
+Train the DQN or DDQN agent on the LunarLander-v2 environment:
 
 ```bash
 python scripts/run.py --algo dqn --config_file experiments/dqn/dqn_config.yaml --seed 1 --eval_interval 10000 --num_eval_trajectories 10 --num_render_trajectories 0 --log_interval 1000
 ```
+
+To run the DDQN agent, simply use the ddqn_config.yaml file in place of the dqn_config.yaml file. No other change is required.
 
 #### **TD3**
 

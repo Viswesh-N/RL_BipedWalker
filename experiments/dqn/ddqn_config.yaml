@@ -1,4 +1,4 @@
-base_config: ddqn
+base_config: dqn
 env_name: LunarLander-v2
 
 hidden_size: 64

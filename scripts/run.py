@@ -7,8 +7,9 @@ import numpy as np
 import torch
 import gym
 
-from utils import torch_utils as ptu
+
 from utils import utils
+from utils import torch_utils as ptu
 from utils.logger import Logger
 from utils.replay_buffer import ReplayBuffer
 
