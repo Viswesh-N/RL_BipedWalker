@@ -9,6 +9,18 @@ import torch.nn as nn
 
 import utils.torch_utils as ptu
 
+class ActorNetwork(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, action_dim):
+        super().__init__()
+        self.base = ptu.build_nn(input_size, hidden_size, num_layers, hidden_size)
+        self.mean = nn.Linear(hidden_size, action_dim)
+        self.log_std = nn.Parameter(torch.zeros(1, action_dim))
+
+    def forward(self, x):
+        x = self.base(x)
+        mean = torch.tanh(self.mean(x))
+        return mean, self.log_std.expand_as(mean)
+
 def ppo_config(
     env_name: str,
     exp_name: Optional[str] = None,
@@ -22,18 +34,16 @@ def ppo_config(
     value_loss_coef: float = 0.5,
     entropy_coef: float = 0.01,
     max_grad_norm: float = 0.5,
+    batch_size: int = 256,
+    learning_starts: int = 25000,
     **kwargs
 ):
     def make_actor(observation_shape: Tuple[int, ...], action_dim: int) -> nn.Module:
-        return nn.Sequential(
-            ptu.build_nn(
-                input_size=np.prod(observation_shape),
-                output_size=hidden_size,
-                num_layers=num_layers,
-                size=hidden_size,
-            ),
-            nn.Linear(hidden_size, action_dim),
-            nn.Tanh()
+        return ActorNetwork(
+            input_size=np.prod(observation_shape),
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            action_dim=action_dim
         )
 
     def make_critic(observation_shape: Tuple[int, ...]) -> nn.Module:
@@ -53,7 +63,7 @@ def ppo_config(
         return torch.optim.lr_scheduler.ConstantLR(optimizer, factor=1.0)
 
     def make_env(render: bool = False):
-        return RecordEpisodeStatistics(gym.make(env_name, render_mode="rgb_array" if render else None, new_step_api=True))
+        return RecordEpisodeStatistics(gym.make(env_name, render_mode="rgb_array" if render else None))
 
     log_string = f"{exp_name or 'ppo'}_{env_name}_h{hidden_size}_l{num_layers}_c{clip_param}"
 
@@ -73,5 +83,8 @@ def ppo_config(
         "log_name": log_string,
         "make_env": make_env,
         "total_steps": total_steps,
+        "batch_size": batch_size,
+        "learning_starts": learning_starts,
+        "replay_buffer_capacity": 1000000,  # Add this line
         **kwargs,
     }

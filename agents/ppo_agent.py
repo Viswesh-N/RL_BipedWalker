@@ -35,51 +35,47 @@ class PPOAgent(nn.Module):
         self.num_epochs = num_epochs
         self.num_mini_batches = num_mini_batches
 
-    def get_action(self, observation, deterministic=False):
-        observation = ptu.from_numpy(observation.astype(np.float32))[None]
+        self.device = ptu.device
+        self.to(self.device)
+
+    def get_action(self, observation):
+        observation = ptu.from_numpy(observation.astype(np.float32)).unsqueeze(0)
         with torch.no_grad():
-            dist = self.actor(observation)
-            if deterministic:
-                action = dist.mean
-            else:
-                action = dist.sample()
-        return ptu.to_numpy(action).squeeze(0)
+            action_mean, action_log_std = self.actor(observation)
+            action = action_mean + torch.exp(action_log_std) * torch.randn_like(action_mean)
+        return ptu.to_numpy(action.squeeze(0))
 
-    def update(self, obs, actions, old_log_probs, returns, advantages, step):
-        batch_size = obs.shape[0]
-        mini_batch_size = batch_size // self.num_mini_batches
+    def update(self, obs, action, reward, next_obs, done, step):
+        # obs = ptu.from_numpy(obs)
+        # action = ptu.from_numpy(action)
+        reward = reward.unsqueeze(-1)
+        # next_obs = ptu.from_numpy(next_obs)
+        # done = done.unsqueeze(-1)
 
-        for _ in range(self.num_epochs):
-            indices = torch.randperm(batch_size)
-            for start in range(0, batch_size, mini_batch_size):
-                end = start + mini_batch_size
-                mb_indices = indices[start:end]
+        with torch.no_grad():
+            next_value = self.critic(next_obs)
+            returns = reward + (1 - done.float().unsqueeze(1)) * next_value
+            advantages = returns - self.critic(obs)
 
-                mb_obs = obs[mb_indices]
-                mb_actions = actions[mb_indices]
-                mb_old_log_probs = old_log_probs[mb_indices]
-                mb_returns = returns[mb_indices]
-                mb_advantages = advantages[mb_indices]
+        action_mean, action_log_std = self.actor(obs)
+        dist = torch.distributions.Normal(action_mean, torch.exp(action_log_std))
+        log_prob = dist.log_prob(action).sum(-1, keepdim=True)
+        entropy = dist.entropy().mean()
 
-                dist = self.actor(mb_obs)
-                values = self.critic(mb_obs).squeeze(-1)
-                log_probs = dist.log_prob(mb_actions).sum(-1)
-                entropy = dist.entropy().mean()
+        ratio = torch.exp(log_prob - log_prob.detach())
+        surr1 = ratio * advantages
+        surr2 = torch.clamp(ratio, 1.0 - self.clip_param, 1.0 + self.clip_param) * advantages
+        actor_loss = -torch.min(surr1, surr2).mean()
 
-                ratio = torch.exp(log_probs - mb_old_log_probs)
-                surr1 = ratio * mb_advantages
-                surr2 = torch.clamp(ratio, 1.0 - self.clip_param, 1.0 + self.clip_param) * mb_advantages
-                actor_loss = -torch.min(surr1, surr2).mean()
+        value_pred = self.critic(obs)
+        value_loss = F.mse_loss(value_pred, returns)
 
-                value_loss = F.mse_loss(values, mb_returns)
+        loss = actor_loss + self.value_loss_coef * value_loss - self.entropy_coef * entropy
 
-                loss = actor_loss + self.value_loss_coef * value_loss - self.entropy_coef * entropy
-
-                self.optimizer.zero_grad()
-                loss.backward()
-                nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
-                nn.utils.clip_grad_norm_(self.critic.parameters(), self.max_grad_norm)
-                self.optimizer.step()
+        self.optimizer.zero_grad()
+        loss.backward()
+        nn.utils.clip_grad_norm_(self.parameters(), self.max_grad_norm)
+        self.optimizer.step()
 
         self.lr_scheduler.step()
 

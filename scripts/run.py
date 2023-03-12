@@ -31,7 +31,6 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
     torch.manual_seed(args.seed)
     ptu.gpu_init(use_gpu=not args.no_gpu, gpu_id=args.which_gpu)
 
-
     env = config["make_env"]()
     eval_env = config["make_env"]()
     render_env = config["make_env"](render=True)
@@ -54,7 +53,16 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
         else:
             action = agent.get_action(observation)
 
-        next_observation, reward, done, info = env.step(action)
+        try:
+            next_observation, reward, done, info = env.step(action)
+        except AssertionError as e:
+            if "r.LengthSquared() > 0.0f" in str(e):
+                print("Caught LiDAR error, resetting environment.")
+                observation = env.reset()
+                continue  # Skip the rest of the loop iteration and move to the next step
+            else:
+                raise e  # Re-raise if it's not the specific assertion we're handling
+
         next_observation = np.asarray(next_observation)
         truncated = info.get("TimeLimit.truncated", False)
 
@@ -104,6 +112,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             if args.num_render_trajectories > 0:
                 video_trajectories = utils.sample_n_trajectories(render_env, agent, args.num_render_trajectories, ep_len, render=True)
                 logger.log_paths_as_videos(video_trajectories, step, fps=env.metadata.get("render_fps", 4), max_videos_to_save=args.num_render_trajectories, video_title="eval_rollouts")
+
 
 
 def main():
